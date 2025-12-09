@@ -15,8 +15,23 @@ const app = express();
 connectDB();
 
 // 中间件
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',')
+  : ['http://localhost:3000', 'https://lyaftwgtwyqr.sealosbja.site'];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // console.log('收到的 Origin:', origin);
+    // console.log('允许的 Origins:', allowedOrigins);
+    // 允许没有 origin 的请求（如移动应用或 curl）
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      // console.log('CORS 被拒绝 - Origin 不在允许列表中');
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
 app.use(express.json());
