@@ -17,7 +17,7 @@ connectDB();
 // 中间件
 const allowedOrigins = process.env.CORS_ORIGIN 
   ? process.env.CORS_ORIGIN.split(',')
-  : ['http://localhost:3000', 'https://lyaftwgtwyqr.sealosbja.site'];
+  : ['http://localhost:3000', 'https://lyaftwgtwyqr.sealosbja.site', 'http://localhost:5173'];
 
 app.use(cors({
   origin: function (origin, callback) {
@@ -32,13 +32,17 @@ app.use(cors({
       callback(new Error('Not allowed by CORS'));
     }
   },
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // 预检请求缓存 24 小时
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(responseFormatter);
 
-// 路由
+// 用户端路由
 app.use('/user', require('./routes/user'));
 app.use('/product', require('./routes/product'));
 app.use('/category', require('./routes/category'));
@@ -46,6 +50,9 @@ app.use('/cart', require('./routes/cart'));
 app.use('/order', require('./routes/order'));
 app.use('/address', require('./routes/address'));
 app.use('/home', require('./routes/home'));
+
+// 管理端路由
+app.use('/admin', require('./routes/admin'));
 
 // 健康检查
 app.get('/health', (req, res) => {
